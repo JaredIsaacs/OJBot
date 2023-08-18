@@ -1,5 +1,7 @@
 import logging
-import os, io, base64
+import os
+import io
+import base64
 
 import discord
 
@@ -20,7 +22,6 @@ class MyClient(discord.Client):
         GUILD_ID = discord.Object(os.getenv('GUILD_ID'))
         self.tree.copy_global_to(guild=GUILD_ID)
         await self.tree.sync(guild=GUILD_ID)
-
 
 
 intents = discord.Intents.default()
@@ -46,22 +47,29 @@ async def mcserver(interaction: discord.Interaction):
         status = server.status()
         query = server.query()
 
-        embed = discord.Embed(title='Minecraft', description=os.getenv('SERVER_IP'), type='rich')
-        embed.set_thumbnail(url='attachment://server.png')
+        embed = mc_embed(status, query)
+
+        await interaction.response.send_message(embed=embed)
+    except ConnectionRefusedError:
+        embed = mc_embed(online=False)
+        await interaction.response.send_message(embed=embed)
+
+
+def mc_embed(status=None, query=None, online: bool = True) -> discord.Embed:
+    embed = discord.Embed(title='Minecraft', description=f'IP: {os.getenv("SERVER_IP")}', type='rich', color=discord.Color.from_str('#5b8731'))
+    embed.set_thumbnail(url='https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Userbox_creeper.svg/2048px-Userbox_creeper.svg.png')
+
+    if online:
         embed.add_field(name='Status:  :green_circle:', value='')
         embed.add_field(name=f'Players:  {status.players.online}', value='')
+    else:
+        embed.add_field(name='Status:  :red_circle:', value='')
+        embed.add_field(name='Players:  N/A', value='')
+
+    if query is not None and query.players.names != []:
         embed.add_field(name='Players Online: ', value=query.players.names, inline=False)
-        embed.color = discord.Color.from_str('#5b8731')
 
-        await interaction.response.send_message(file=get_server_icon(status), embed=embed)
-    except ConnectionRefusedError:
-        await interaction.response.send_message('MCServer is down!')
-
-
-def get_server_icon(status):
-    icon = status.icon.split(',')[1]
-    file = discord.File(io.BytesIO(base64.b64decode(icon)), filename='server.png')
-    return file
+    return embed
 
 
 if __name__ == '__main__':

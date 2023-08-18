@@ -5,6 +5,49 @@ from pathlib import Path
 wd = os.getcwd()
 p = Path(wd)
 
-p = p.parent / 'worlde-bot'
+user_data = p.parent / 'mcserver' / 'usercache.json'
+lp_user_data = user_data.parent / 'plugins' / 'LuckPerms' / 'json-storage' / 'users'
 
-print(p)
+
+lp_user = {
+            "uuid": "placeholder",
+            "name": "placeholder",
+            "primaryGroup": "default",
+            "parents": [
+                    {
+                    "group": "default"
+                    }
+                ],
+            "prefixes": [
+                    {
+                    "prefix": "placeholder",
+                    "priority": 20
+                    }
+                 ]
+            }
+
+
+def get_user_uuid(username: str):
+    f = open(user_data)
+    data = json.load(f)
+
+    for user in data:
+        if user['name'] == username:
+            return user['uuid']
+
+    raise IndexError
+
+
+def add_user_prefix(username: str, prefix: str):
+    uuid = get_user_uuid(username)
+    
+    lp_user['uuid'] = uuid
+    lp_user['name'] = username
+    lp_user['prefixes'][0]['prefix'] = prefix
+
+    with open(lp_user_data / f'{uuid}.json', 'w') as outfile:
+        json.dump(lp_user, outfile)
+
+username = 'TheSolerino'
+add_user_prefix(username, 'Straightmer')
+

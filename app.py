@@ -91,6 +91,7 @@ async def link(interaction: discord.Interaction, account_name: str):
     except AssertionError: # User does not exist.
         key = str(uuid.uuid4()).split('-', maxsplit=1)[0]
         MCDB.add_user(key, account_name)
+        message_user(account_name, key)
 
         await interaction.response.send_message(f'A message send to {account_name} with your verification key!\nRespond to this message with the key to complete linking')
     except ConnectionRefusedError:

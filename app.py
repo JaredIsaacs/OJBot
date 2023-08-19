@@ -8,7 +8,6 @@ from discord import app_commands
 from dotenv import load_dotenv
 from mcconn import message_user, add_user_prefix
 from mcdb import MinecraftDB
-
 load_dotenv()
 
 
@@ -97,7 +96,7 @@ async def link(interaction: discord.Interaction, account_name: str):
     except AssertionError: # User does not exist.
         key = str(uuid.uuid4()).split('-', maxsplit=1)[0]
         MCDB.add_user(key, account_name)
-        message_user(account_name, key)
+        message_user(account_name, f'Your discord verification code is {key}.')
 
         await interaction.response.send_message(f'{interaction.user.mention}. A message has been to {account_name} with your verification key!\nRespond to this message with the key to complete linking accounts.')
     except ConnectionRefusedError:

@@ -56,7 +56,11 @@ async def on_message(message: discord.Message):
     await rmsg.delete()
     await message.delete()
 
-    MCDB.link_account(user_key, user_id)
+    try:
+        MCDB.link_account(user_key, user_id)
+        await message.channel.send(f'Congratulations {message.author.mention}, your link has completed successfully!')
+    except AssertionError:
+        await message.channel.send(f'Sorry {message.author.mention}, but the key you\'e entered is incorrect. Please try again.')
 
 
 @client.tree.command()

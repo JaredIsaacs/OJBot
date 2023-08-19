@@ -26,6 +26,10 @@ class MinecraftDB():
 
     
     def link_account(self, key: str, user_id: int) -> None:
+        self.cur.execute('''SELECT * from users
+                        WHERE key = ?''', (key,))
+        assert self.cur.fetchone()
+
         self.cur.execute('''UPDATE users
                         SET user_id = ?
                         WHERE key = ?''', (user_id, key))
@@ -46,11 +50,11 @@ class MinecraftDB():
             print(e)
 
 
-#mcdb = MinecraftDB()
-#mcdb.init_db()
-#key = str(uuid.uuid4())
+mcdb = MinecraftDB()
+mcdb.init_db()
+key = str(uuid.uuid4())
 
 #mcdb.add_user(key, 'PapaPaco')
-#mcdb.link_account(key, 12345)
-#mcdb.select_all()
+#mcdb.link_account('aa1bbf08', 12325)
+mcdb.select_all()
 #print(mcdb.get_key('PapaP'))

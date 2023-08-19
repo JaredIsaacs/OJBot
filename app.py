@@ -19,9 +19,9 @@ class MyClient(discord.Client):
 
 
     async def setup_hook(self) -> None:
-        GUILD_ID = discord.Object(os.getenv('GUILD_ID'))
-        self.tree.copy_global_to(guild=GUILD_ID)
-        await self.tree.sync(guild=GUILD_ID)
+        guild_id = discord.Object(os.getenv('GUILD_ID'))
+        self.tree.copy_global_to(guild=guild_id)
+        await self.tree.sync(guild=guild_id)
 
 
 intents = discord.Intents.default()
@@ -40,6 +40,23 @@ async def on_ready():
 async def on_guild_join(guild: discord.guild.Guild):
     client.tree.copy_global_to(guild=guild)
     await client.tree.sync(guild=guild)
+
+
+@client.event
+async def on_message(message: discord.Message):
+    rmsg = message.reference.cached_message
+    if message.type != discord.MessageType.reply:
+        return
+    if rmsg.author == client.user.id:
+        return
+    
+    user_key = message.content
+    user_id = message.author.id
+
+    await rmsg.delete()
+    await message.delete()
+
+    MCDB.link_account(user_key, user_id)
 
 
 @client.tree.command()

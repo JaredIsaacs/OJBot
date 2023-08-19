@@ -58,7 +58,7 @@ async def on_message(message: discord.Message):
 
     try:
         MCDB.link_account(user_key, user_id)
-        await message.channel.send(f'Congratulations {message.author.mention}, your link has completed successfully!')
+        await message.channel.send(f'Congratulations {message.author.mention}, your accounts have been linked successfully!')
     except AssertionError:
         await message.channel.send(f'Sorry {message.author.mention}, but the key you\'e entered is incorrect. Please try again.')
 
@@ -91,13 +91,13 @@ async def link(interaction: discord.Interaction, account_name: str):
         key = MCDB.get_key(account_name)
         message_user(account_name, key)
 
-        await interaction.response.send_message(f'A message send to {account_name} with your verification key!\nRespond to this message with the key to complete linking')
+        await interaction.response.send_message(f'{interaction.user.mention}. A message has been sent to {account_name} with your verification key!\nRespond to this message with the key to complete linking accounts.')
     except AssertionError: # User does not exist.
         key = str(uuid.uuid4()).split('-', maxsplit=1)[0]
         MCDB.add_user(key, account_name)
         message_user(account_name, key)
 
-        await interaction.response.send_message(f'A message send to {account_name} with your verification key!\nRespond to this message with the key to complete linking')
+        await interaction.response.send_message(f'{interaction.user.mention}. A message has been to {account_name} with your verification key!\nRespond to this message with the key to complete linking accounts.')
     except ConnectionRefusedError:
         await interaction.response.send_message('The server must be up in order to link accounts!')
 

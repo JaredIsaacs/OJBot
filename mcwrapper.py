@@ -23,7 +23,7 @@ lp_user = {
                     "prefix": "placeholder",
                     "priority": 20
                     }
-                 ]
+                ]
             }
 
 

@@ -39,8 +39,16 @@ class MinecraftDB():
     def get_key(self, username: str) -> str:
         self.cur.execute('''SELECT key from users
                         WHERE username = ?''', (username,))
+        key = self.cur.fetchone()
+        assert key, 'User does not exist'
+        return key[0]
+
+
+    def get_mc_account(self, user_id: int) -> str:
+        self.cur.execute('''SELECT username from users
+                        WHERE user_id = ?''', (user_id,))
         username = self.cur.fetchone()
-        assert username, 'User does not exist'
+        assert username, 'User has not linked accounts'
         return username[0]
 
 
@@ -50,11 +58,11 @@ class MinecraftDB():
             print(e)
 
 
-mcdb = MinecraftDB()
-mcdb.init_db()
-key = str(uuid.uuid4())
+#mcdb = MinecraftDB()
+#mcdb.init_db()
+#key = str(uuid.uuid4())
 
 #mcdb.add_user(key, 'PapaPaco')
 #mcdb.link_account('aa1bbf08', 12325)
-mcdb.select_all()
+#mcdb.select_all()
 #print(mcdb.get_key('PapaP'))

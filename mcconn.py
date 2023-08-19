@@ -51,7 +51,7 @@ def add_user_prefix(username: str, prefix: str):
         json.dump(lp_user, outfile)
 
 
-def message_user(username: str, key: str):
+def message_user(username: str, message: str):
     with MCRcon('localhost', str(os.getenv('RCON_PASS'))) as mcr:
-        mcr.command(f'msg {username} Your discord verifcation code is {key}.')
+        mcr.command(f'msg {username} {message}')
                 

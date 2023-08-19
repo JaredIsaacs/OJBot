@@ -6,7 +6,7 @@ import discord
 from mcstatus import JavaServer 
 from discord import app_commands
 from dotenv import load_dotenv
-from mcconn import message_user
+from mcconn import message_user, add_user_prefix
 from mcdb import MinecraftDB
 
 load_dotenv()
@@ -58,7 +58,9 @@ async def on_message(message: discord.Message):
 
     try:
         MCDB.link_account(user_key, user_id)
-        await message.channel.send(f'Congratulations {message.author.mention}, your accounts have been linked successfully!')
+        mc_account = MCDB.get_mc_account(user_id)
+        message_user(mc_account, f'Accounts, MC: "{mc_account}" and Discord: "{message.author.name}", have been linked!')
+        await message.channel.send(f'Congratulations {message.author.mention}! Your accounts, MC: "{mc_account}" and Discord: "{message.author.name}", have been linked successfully.')
     except AssertionError:
         await message.channel.send(f'Sorry {message.author.mention}, but the key you\'e entered is incorrect. Please try again.')
 
@@ -89,7 +91,7 @@ async def link(interaction: discord.Interaction, account_name: str):
             return
         
         key = MCDB.get_key(account_name)
-        message_user(account_name, key)
+        message_user(account_name, f'Your discord verifcation code is {key}.')
 
         await interaction.response.send_message(f'{interaction.user.mention}. A message has been sent to {account_name} with your verification key!\nRespond to this message with the key to complete linking accounts.')
     except AssertionError: # User does not exist.
@@ -100,6 +102,15 @@ async def link(interaction: discord.Interaction, account_name: str):
         await interaction.response.send_message(f'{interaction.user.mention}. A message has been to {account_name} with your verification key!\nRespond to this message with the key to complete linking accounts.')
     except ConnectionRefusedError:
         await interaction.response.send_message('The server must be up in order to link accounts!')
+
+
+@client.tree.command()
+async def mcprefix(interaction: discord.Interaction, prefix: str):
+    try:
+        mc_account = MCDB.get_mc_account(interaction.user.id)
+        add_user_prefix(mc_account, prefix)
+    except AssertionError:
+        await interaction.response.send_message(f'Sorry {interaction.user.mention}, but you need to first link your minecraft and discord accounts in order to use this command.\nType /link to begin the linking process.')
 
 
 def mc_embed(status=None, query=None, online: bool = True) -> discord.Embed:

@@ -1,5 +1,6 @@
 import json
 import os
+import subprocess
 
 from pathlib import Path
 from mcrcon import MCRcon
@@ -7,8 +8,9 @@ from mcrcon import MCRcon
 wd = os.getcwd()
 p = Path(wd)
 
-user_data = p.parent / 'mcserver' / 'usercache.json'
-lp_user_data = user_data.parent / 'plugins' / 'LuckPerms' / 'json-storage' / 'users'
+mcserver = p.parent / 'mcserver'
+user_data = mcserver / 'usercache.json'
+lp_user_data = mcserver / 'plugins' / 'LuckPerms' / 'json-storage' / 'users'
 
 
 lp_user = {
@@ -55,3 +57,6 @@ def message_user(username: str, message: str):
     with MCRcon('localhost', str(os.getenv('RCON_PASS'))) as mcr:
         mcr.command(f'msg {username} {message}')
                 
+
+def start_server():
+    subprocess.call(['screen', '-dmS', 'minecraft', mcserver / 'run.sh'])

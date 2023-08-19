@@ -1,6 +1,8 @@
 import json
 import os
+
 from pathlib import Path
+from mcrcon import MCRcon
 
 wd = os.getcwd()
 p = Path(wd)
@@ -48,6 +50,9 @@ def add_user_prefix(username: str, prefix: str):
     with open(lp_user_data / f'{uuid}.json', 'w') as outfile:
         json.dump(lp_user, outfile)
 
-username = 'TheSolerino'
-add_user_prefix(username, 'Straightmer')
+
+def message_user(username: str, code: int):
+    with MCRcon('localhost', 'pass123') as mcr:
+        mcr.command(f'msg {username} Your discord verifcation code is {code}.')
+
 

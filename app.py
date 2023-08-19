@@ -109,6 +109,7 @@ async def mcprefix(interaction: discord.Interaction, prefix: str):
     try:
         mc_account = MCDB.get_mc_account(interaction.user.id)
         add_user_prefix(mc_account, prefix)
+        await interaction.response.send_message(f'Minecraft user, {mc_account}, prefix has been changed to {prefix}.')
     except AssertionError:
         await interaction.response.send_message(f'Sorry {interaction.user.mention}, but you need to first link your minecraft and discord accounts in order to use this command.\nType /link to begin the linking process.')
 

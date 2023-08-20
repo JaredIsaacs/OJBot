@@ -43,14 +43,10 @@ def get_user_uuid(username: str):
 
 
 def add_user_prefix(username: str, prefix: str):
-    uuid = get_user_uuid(username)
-    
-    lp_user['uuid'] = uuid
-    lp_user['name'] = username
-    lp_user['prefixes'][0]['prefix'] = prefix
+    with MCRcon('localhost', str(os.getenv('RCON_PASS'))) as mcr:
+        mcr.command(f'lp user {username} meta removeprefix 20')
+        mcr.command(f'lp user {username} meta addprefix 20 {prefix}')
 
-    with open(lp_user_data / f'{uuid}.json', 'w') as outfile:
-        json.dump(lp_user, outfile)
 
 
 def message_user(username: str, message: str):
@@ -59,4 +55,4 @@ def message_user(username: str, message: str):
                 
 
 def start_server():
-    subprocess.call(['screen', '-dmS', 'minecraft', mcserver / 'run.sh'])
+    os.system('./run.sh') 

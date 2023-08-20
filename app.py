@@ -8,7 +8,7 @@ from mcstatus import JavaServer
 from discord import app_commands
 from discord.ext import commands
 from dotenv import load_dotenv
-from mcconn import message_user, add_user_prefix
+from mcconn import message_user, add_user_prefix, start_server
 from mcdb import MinecraftDB
 load_dotenv()
 
@@ -55,11 +55,12 @@ async def on_guild_join(guild: discord.guild.Guild):
 @client.event
 async def on_message(message: discord.Message):
     rmsg = message.reference.cached_message
+
     if message.type != discord.MessageType.reply:
         return
-    if rmsg.author == client.user.id:
+    if rmsg.author.id != client.user.id:
         return
-    
+
     user_key = message.content
     user_id = message.author.id
 
@@ -94,6 +95,7 @@ async def mcserver(interaction: discord.Interaction):
 async def link(interaction: discord.Interaction, account_name: str):
     try:
         server = JavaServer.lookup(os.getenv('SERVER_IP'))
+        status = server.status()
         query = server.query()
     
         if account_name not in query.players.names:
@@ -112,6 +114,17 @@ async def link(interaction: discord.Interaction, account_name: str):
         await interaction.response.send_message(f'{interaction.user.mention}. A message has been to {account_name} with your verification key!\nRespond to this message with the key to complete linking accounts.')
     except ConnectionRefusedError:
         await interaction.response.send_message('The server must be up in order to link accounts!')
+
+@client.tree.command()
+async def mcstart(interaction: discord.Interaction):
+    try:
+        server = JavaServer.lookup(os.getenv('SERVER_IP'))
+        status = server.status()
+        query = server.query()
+        await interaction.response.send_message(f'Sorry {interaction.user.mention}, cannot start the server. The server is currently running!')
+    except ConnectionRefusedError:
+        start_server()
+        await interaction.response.send_message(f'Starting server @ {os.getenv("SERVER_IP")}')
 
 
 @client.tree.command()

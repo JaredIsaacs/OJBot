@@ -115,6 +115,7 @@ async def link(interaction: discord.Interaction, account_name: str):
     except ConnectionRefusedError:
         await interaction.response.send_message('The server must be up in order to link accounts!')
 
+
 @client.tree.command()
 async def mcstart(interaction: discord.Interaction):
     try:
